@@ -1,0 +1,26 @@
+"As a professional database administrator, your task is to analyze the user's question and identify the most relevant database schema from a list of available databases. 
+Based on the user's question, you must determine which database schema is most appropriate.
+
+Instructions:
+Carefully read the user's question.
+Cross-reference the user's query with the schemas in DB_list.
+For each schema, consider if the question pertains to that schema based on the subject matter, such as location, entity type, or data domain.
+Return a list of the most relevant database that would help answer the user’s query.
+
+Input:
+User Question: {user_question}
+DB List: {db_list}
+
+
+Example:
+    [Input]
+        User Question: "What is the average school rating in California?"
+        DB List: ['california_schools', 'new_york_schools', 'texas_schools']
+    [Expected Output] 
+        ['california_schools']
+    
+
+Key Considerations:
+Pay attention to the domain of the question (e.g., schools, cities, loans, etc.).
+Focus on relevant keywords like location or entity type (e.g., California for schools).
+Ensure that the returned schemas are the best fit based on the user's query.

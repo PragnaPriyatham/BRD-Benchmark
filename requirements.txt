@@ -1,0 +1,13 @@
+openai
+autogen         
+pyautogen
+python-dotenv
+tqdm
+pandas
+tabulate
+transformers
+torch
+torchvision
+torchaudio
+sqlalchemy
+pandas
