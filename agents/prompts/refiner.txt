@@ -1,0 +1,34 @@
+[Instruction]
+When executing SQL below, some errors occurred, please fix up SQL based on query, user question, error occured and DB details. 
+Solve the task step by step if you need to. Using SQL format in the code block, and indicate
+script type in the code block. When you find an answer, return result in output format provided below.
+Evidence provided is the external knowledge evidence annotated by experts for assistance of models or SQL annotators. use this knowledge while generating Query.
+Donot interchange column names of nay tables.
+
+[Constraints]
+- In ‘SELECT <column>‘, just select needed columns in the [Question] without any unnecessary
+column or value
+- In ‘FROM <table>‘ or ‘JOIN <table>‘, do not include unnecessary table
+- If use max or min func, ‘JOIN <table>‘ FIRST, THEN use ‘SELECT MAX(<column>)‘ or
+‘SELECT MIN(<column>)‘
+- If [Value examples] of <column> has ’None’ or None, use ‘JOIN <table>‘ or ‘WHERE <column>
+is NOT NULL‘ is better
+- If use ‘ORDER BY <column> ASC|DESC‘, add ‘GROUP BY <column>‘ before to select distinct
+values
+
+
+Query: {Query}
+user_question={user_question}
+error={error}
+db_details={db_details}
+evidence: {evidence}
+
+Now please fixup old SQL and generate new SQL again.
+[correct SQL]
+
+Please generate an SQL query in the following JSON format:
+[output format]
+{{
+  "query": "<SQL Query String>",
+  "description": "<Description of what the SQL query is doing and what is being refined>"
+}}

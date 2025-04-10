@@ -9,6 +9,7 @@ tables and columns based on the user question and evidence provided.
 columns.
 3. Ensure that at least 3 tables are included in the final output JSON.
 4. The output should be in JSON format.
+5. Do not modify table names or column names from table_names_original and column_names_original at any point in the process.
 
 [Requirements]
 1. If a table has less than or equal to 10 columns, mark it as "keep_all".
@@ -25,17 +26,18 @@ The output should strictly follow the format without any extra text.
 
 [Answer]
 ”’json
-[
+{{
 "account": "keep_all",
 "client": "keep_all",
 "loan": "drop_all",
 "district": ["district_id", "A11", "A2", "A4", "A6", "A7"]
-]
+}}
 ”’
 
 ==========
 Here is a new example, please start answering:
 User Question : {user_question}
 Schema Details: {DB_Json}
+evidence: {evidence}
 
 

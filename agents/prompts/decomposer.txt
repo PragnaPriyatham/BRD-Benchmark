@@ -3,13 +3,15 @@ You are a powerful SQL query generator, and your task is to break down complex u
 Question: {user_question}
 schema: {schema}
 schema_data: {schema_data}
+evidence: {evidence}
 
 1. Understand the User’s Question: Read the user's question and break it down into simpler sub-questions, if necessary.
 2. Use schema and schema_data provideed while constructing an sql Query. schema_data contains tables and columns thare are useful to construct the query.
 3. Generate SQL for Each Sub-Question: For each sub-question, write an SQL query that would retrieve the necessary information from the database.
 4. Chain the Sub-Questions: Ensure that each sub-question builds upon the previous one, either by using results from earlier sub-queries or directly answering the original query.
 5. Final SQL: After breaking down the question and generating intermediate SQL queries, combine them into the final SQL query that fully answers the original question.
-
+6. Evidence provided is the external knowledge evidence annotated by experts for assistance of models or SQL annotators. use this knowledge while generating Query.
+7. Provded evidence is the clear hint to write the query
 
 Example:
 
@@ -22,26 +24,23 @@ Step 2: Sub-questions and SQL Queries
 
 - Sub-question 1: What is the school with the lowest excellence rate?
   - SQL Query 1:
-    SELECT school_id, school_name, excellence_rate
-    FROM schools
-    ORDER BY excellence_rate ASC
-    LIMIT 1;
+    SELECT school_id, school_name, excellence_rate FROM schools ORDER BY excellence_rate ASC LIMIT 1;
     
 
 - Sub-question 2: What is the complete address (Street, City, Zip, and State) of the school identified in Sub-question 1?
   - SQL Query 2:
-    SELECT street, city, zip, state
-    FROM addresses
-    WHERE school_id = (SELECT school_id FROM schools ORDER BY excellence_rate ASC LIMIT 1);
+    SELECT street, city, zip, state FROM addresses WHERE school_id = (SELECT school_id FROM schools ORDER BY excellence_rate ASC LIMIT 1);
     
 
 Step 3: Final Query
 - Combine the results from Sub-question 1 and Sub-question 2 into the final SQL query:
-  SELECT street, city, zip, state
-  FROM addresses
-  WHERE school_id = (SELECT school_id FROM schools ORDER BY excellence_rate ASC LIMIT 1);
+  SELECT street, city, zip, state FROM addresses WHERE school_id = (SELECT school_id FROM schools ORDER BY excellence_rate ASC LIMIT 1);
 
-[Expected Output] 
-        SELECT street, city, zip, state
-        FROM addresses
-        WHERE school_id = (SELECT school_id FROM schools ORDER BY excellence_rate ASC LIMIT 1);
+
+
+Please generate an SQL query in the following JSON format:
+[output format]
+{{
+  "query": "<SQL Query String>",
+  "description": "<Description of what the SQL query is doing and what is being refined>"
+}}
