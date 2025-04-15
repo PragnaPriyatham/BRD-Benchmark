@@ -1,7 +1,4 @@
 import asyncio
-from agents.selector import Selector  
-from agents.decomposer import Decomposer
-from agents.refiner import Refiner
 from dotenv import load_dotenv
 import os
 import sqlite3
@@ -12,8 +9,6 @@ import openai
 from autogen import AssistantAgent
 from autogen_agentchat.agents import AssistantAgent
 from autogen_ext.models.openai import OpenAIChatCompletionClient
-
-
 
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
@@ -29,7 +24,7 @@ class Master_Bot():
         evidence = input()
         print("Please enter DB_ID:")
         db_id = input()
-        '''
+        
         # testing data
 
         # db_id = "california_schools"
@@ -40,17 +35,37 @@ class Master_Bot():
         user_question = "Give the names of the schools with the percent eligible for free meals in K-12 is more than 0.1 and test takers whose test score is greater than or equal to 1500?"
         evidence= "VPercent eligible for free meals = Free Meal Count (K-12) / Total (Enrollment (K-12)"
 
+        '''
 
-        self.message['user_question'] = user_question
-        self.message['evidence'] = evidence
-        self.message['db_id'] = db_id
-        asyncio.run(self.start())
 
-    async def Access_Autogen_openai(self, prompt: str) -> str:
+
+        with open('./mini_dev/llm/mini_dev_data/minidev/MINIDEV/mini_dev_sqlite.json', 'r') as f:
+            dev_data = json.load(f)
+        output={}
+        # Loop through dev data and feed it into your evaluator
+        for idx,input in enumerate(dev_data):
+            db_id = input['db_id']
+            question = input['question']
+            evidence = input.get('evidence', '')  # Handle missing evidence if any
+
+
+            self.message['user_question'] = question
+            self.message['evidence'] = evidence
+            self.message['db_id'] = db_id
+            final_sql=asyncio.run(self.start())
+            formatted = f"{final_sql}\t----- bird -----\t{db_id}"
+            output[str(idx)] = formatted
+            output_path = './mini_dev/llm/exp_result/masterbot/masterbot_predict_mini_dev_gpt_4_sqlite.json'
+            with open(output_path, 'w') as f:
+                json.dump(output, f, indent=4)
+
+
+
+    async def Access_Autogen_openai(self, prompt):
             load_dotenv()
             OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
             openai.api_key = OPENAI_API_KEY
-            model_client = OpenAIChatCompletionClient(model="gpt-4o")
+            model_client = OpenAIChatCompletionClient(model="gpt-4-turbo")
             agent = AssistantAgent("assistant", model_client=model_client)
             response = await agent.run(task=prompt) 
             await model_client.close()
@@ -63,7 +78,8 @@ class Master_Bot():
         self.message['filters'] = await self.selector()
         schema=self.message['db_id']
         Selected_details_filters= json.loads(self.message['filters'])
-        table_details_path= os.path.join(current_directory, 'data\mini_dev\llm\mini_dev_data\dev_20240627\dev_databases\dev_databases',self.message['db_id'],'database_description')
+
+        table_details_path= os.path.join(current_directory, 'mini_dev\llm\mini_dev_data\minidev\MINIDEV\dev_databases',self.message['db_id'],'database_description')
         for table in Selected_details_filters.items():
             filename=table[0]+'.csv'
             tablepath = os.path.join(table_details_path, filename)
@@ -85,11 +101,13 @@ class Master_Bot():
             results = self.execute_sql(Query_generated['query'])
         print("This is FINAL Query")
         print(results)
+
+
         return results['sql']
         
     def execute_sql(self,Query_generated):
         schema=self.message['db_id']
-        dev_sqlite= os.path.join(current_directory, 'data\mini_dev\llm\mini_dev_data\dev_20240627\dev_databases\dev_databases',schema)
+        dev_sqlite= os.path.join(current_directory, 'mini_dev\llm\mini_dev_data\minidev\MINIDEV\dev_databases',schema)
         filename=schema+'.sqlite'
         db_path = os.path.join(dev_sqlite, filename)
         print("executing this query in sql")
@@ -122,9 +140,13 @@ class Master_Bot():
         finally:
             connection.close()
 
+
+
+    
+
     def selected_schema_data(self):
         db_id=self.message['db_id'] 
-        dev_tables_json = os.path.join(current_directory, 'data\mini_dev\llm\mini_dev_data\dev_20240627\dev_tables.json')
+        dev_tables_json = os.path.join(current_directory, 'mini_dev\llm\mini_dev_data\minidev\MINIDEV\dev_tables.json')
         with open(dev_tables_json, 'r') as file:
             json_data = json.load(file)
     
@@ -139,23 +161,25 @@ class Master_Bot():
 
                 return selected_schema_data
 
+
+
     async def selector(self):
-            user_question=self.message['user_question'] 
-            selected_schema_data=self.selected_schema_data()
-            with open("agents/prompts/tables_selector.txt", "r", encoding='utf-8') as file:
-                table_selector_prompt = file.read()
+        user_question=self.message['user_question'] 
+        selected_schema_data=self.selected_schema_data()
+        with open("agents/prompts/tables_selector.txt", "r", encoding='utf-8') as file:
+            table_selector_prompt = file.read()
 
-            ################################ Agent 1 : filter table and columns Selector ####################
-            print("\033[0;34mAgent 1: Table selector in action\033[0m")
-            table_selector_prompt = table_selector_prompt.format(user_question=user_question, DB_Json=selected_schema_data,evidence=self.message['evidence'])
-            filtered_details = await self.Access_Autogen_openai(table_selector_prompt)
-            ################################################################################################
+        ################################ Agent 1 : filter table and columns Selector ####################
+        print("\033[0;34mAgent 1: Table selector in action\033[0m")
+        table_selector_prompt = table_selector_prompt.format(user_question=user_question, DB_Json=selected_schema_data,evidence=self.message['evidence'])
+        filtered_details = await self.Access_Autogen_openai(table_selector_prompt)
+        ################################################################################################
 
-            filtered_details = filtered_details.messages[1].content
-            match = re.search(r'({.*})', filtered_details, re.DOTALL)
-            filtered_details=match.group(1)
-            return filtered_details
-    
+        filtered_details = filtered_details.messages[1].content
+        match = re.search(r'({.*})', filtered_details, re.DOTALL)
+        filtered_details=match.group(1)
+        return filtered_details
+
     
     async def decomposer(self):
         user_question=self.message['user_question']
@@ -185,7 +209,7 @@ class Master_Bot():
         print("\033[0;34mAgent 3: Refiner in action\033[0m")
         refiner_prompt = refiner_prompt.format(user_question=user_question,Query=results['sql'],error=results['sqlite_error'],db_details=db_details,evidence=self.message['evidence'])
         refined_query = await self.Access_Autogen_openai(refiner_prompt)
-        ##############################################################################################
+        ###########################################################################################
 
         refined_query = refined_query.messages[1].content
         match = re.search(r'({.*})', refined_query, re.DOTALL)

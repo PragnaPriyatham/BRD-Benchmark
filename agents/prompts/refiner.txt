@@ -30,5 +30,4 @@ Please generate an SQL query in the following JSON format:
 [output format]
 {{
   "query": "<SQL Query String>",
-  "description": "<Description of what the SQL query is doing and what is being refined>"
 }}
