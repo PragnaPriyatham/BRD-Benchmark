@@ -1,5 +1,7 @@
 .env
-/mini_dev_data/
+mini_dev/llm/mini_dev_data
 __pycache__/
 autogen_venv/
-autogen-birdsql/agents/finetune/
+llm/mini_dev_data/minidev.zip
+llm/mini_dev_data/minidev/
+evaluation/__pycache__/*

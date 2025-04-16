@@ -37,13 +37,21 @@ class Master_Bot():
 
         '''
 
+        output_path = './mini_dev/llm/exp_result/masterbot/masterbot_predict_mini_dev_gpt_4_sqlite.json'
 
 
         with open('./mini_dev/llm/mini_dev_data/minidev/MINIDEV/mini_dev_sqlite.json', 'r') as f:
             dev_data = json.load(f)
-        output={}
+        try:
+            with open(output_path, 'r') as f:
+                output = json.load(f)
+        except FileNotFoundError:
+            output = {}
+        
         # Loop through dev data and feed it into your evaluator
         for idx,input in enumerate(dev_data):
+            if idx < 88:
+                continue  
             db_id = input['db_id']
             question = input['question']
             evidence = input.get('evidence', '')  # Handle missing evidence if any
@@ -55,7 +63,6 @@ class Master_Bot():
             final_sql=asyncio.run(self.start())
             formatted = f"{final_sql}\t----- bird -----\t{db_id}"
             output[str(idx)] = formatted
-            output_path = './mini_dev/llm/exp_result/masterbot/masterbot_predict_mini_dev_gpt_4_sqlite.json'
             with open(output_path, 'w') as f:
                 json.dump(output, f, indent=4)
 
@@ -78,12 +85,12 @@ class Master_Bot():
         self.message['filters'] = await self.selector()
         schema=self.message['db_id']
         Selected_details_filters= json.loads(self.message['filters'])
-
+        df_table_details={}
         table_details_path= os.path.join(current_directory, 'mini_dev\llm\mini_dev_data\minidev\MINIDEV\dev_databases',self.message['db_id'],'database_description')
         for table in Selected_details_filters.items():
             filename=table[0]+'.csv'
             tablepath = os.path.join(table_details_path, filename)
-            df_table_details= pd.read_csv(tablepath)
+            df_table_details[table[0]]= pd.read_csv(tablepath, encoding='ISO-8859-1')
         print(self.message)
        
         Query_generated = await self.decomposer()
