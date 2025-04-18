@@ -9,7 +9,7 @@ meta_time_out=30.0
 #predicted_sql_path='../sql_result/predict_mini_dev_gpt-4-32k_cot_SQLite.json' # Replace with your predict sql json path
 # predicted_sql_path='../sql_result/predict_mini_dev_gpt-4-32k_cot_PostgreSQL.json' # Replace with your predict sql json path
 # predicted_sql_path='../sql_result/predict_mini_dev_gpt-4-32k_cot_MySQL.json' # Replace with your predict sql json path
-predicted_sql_path='../llm/exp_result/masterbot/masterbot_predict_mini_dev_gpt_4_sqlite.json'
+predicted_sql_path='../llm/exp_result/masterbot/masterbot_predict_mini_dev_gpt_4_turbo_sqlite.json'
 #predicted_sql_path='../llm/exp_result/masterbot/masterbot_predict_mini_dev_LLama_3_sqlite.json'
 
 

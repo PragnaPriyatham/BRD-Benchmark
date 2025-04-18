@@ -19,7 +19,7 @@ class Master_Bot():
     def __init__(self):
         self.message = dict()
         #******************** for AUTOGEN GPT***************************
-        output_path = './mini_dev/llm/exp_result/masterbot/masterbot_predict_mini_dev_gpt_4_sqlite.json' 
+        output_path = './mini_dev/llm/exp_result/masterbot/masterbot_predict_mini_dev_gpt_4_turbo_sqlite.json' 
         #******************** for Groq Llama***************************
         #output_path = './mini_dev/llm/exp_result/masterbot/masterbot_predict_mini_dev_LLama_3_sqlite.json'
 
@@ -34,6 +34,8 @@ class Master_Bot():
         
         # Loop through dev data and feed it into your evaluator
         for idx,input in enumerate(dev_data):
+            if idx < 88:
+                continue
             db_id = input['db_id']
             question = input['question']
             evidence = input.get('evidence', '')  # Handle missing evidence if any

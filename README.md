@@ -39,7 +39,8 @@ Stores SQL predictions into masterbot_predict_mini_dev_gpt_4_sqlite.json.
 
     Requirements
     Install dependencies:
-    pip install -r requirements.txt
+        
+        pip install -r requirements.txt
 
 
 Clone the mini_dev Benchmark
