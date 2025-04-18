@@ -11,6 +11,12 @@ columns.
 4. The output should be in JSON format.
 5. Do not modify table names or column names from table_names_original and column_names_original at any point in the process.
 
+
+"Important: Never interchange or mix columns between different tables. Only use columns that belong to the specified table. 
+    Ensure the SQL query uses correct table-column relationships as defined in the schema."
+
+
+
 [Requirements]
 1. If a table has less than or equal to 10 columns, mark it as "keep_all".
 2. If a table is completely irrelevant to the user question and evidence, mark it as "drop_all".
@@ -27,10 +33,10 @@ The output should strictly follow the format without any extra text.
 [Answer]
 ”’json
 {{
-"account": "keep_all",
-"client": "keep_all",
-"loan": "drop_all",
-"district": ["district_id", "A11", "A2", "A4", "A6", "A7"]
+  "account": ["account_id", "district_id", "frequency", "date"],
+  "client": ["client_id", "gender", "birth_date", "district_id"],
+  "district": ["district_id", "A11", "A2", "A4", "A6", "A7"]
+
 }}
 ”’
 

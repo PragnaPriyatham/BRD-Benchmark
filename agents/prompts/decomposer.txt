@@ -41,5 +41,5 @@ Step 3: Final Query
 Please generate an SQL query in the following JSON format:
 [output format]
 {{
-  "query": "<SQL Query String>",
+  "query": "<SQL Query String>"
 }}
